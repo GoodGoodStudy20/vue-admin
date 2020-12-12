@@ -1,8 +1,6 @@
 <template>
   <div>
-    <el-button type="primary" icon="el-icon-plus" @click="visible = true"
-      >添加</el-button
-    >
+    <el-button type="primary" icon="el-icon-plus" @click="add">添加</el-button>
 
     <el-table :data="trademark" border style="width: 100%; margin: 20px 0">
       <el-table-column type="index" label="序号" width="80px" align="center">
@@ -14,9 +12,16 @@
         </template>
       </el-table-column>
       <el-table-column label="操作">
-        <template>
-          <el-button type="warning" icon="el-icon-edit">修改</el-button>
-          <el-button type="danger" icon="el-icon-delete">删除</el-button>
+        <template slot-scope="{ row }">
+          <el-button type="warning" icon="el-icon-edit" @click="update(row)"
+            >修改</el-button
+          >
+          <el-button
+            type="danger"
+            icon="el-icon-delete"
+            @click="delTrademark(scope.row.id)"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -34,7 +39,11 @@
     </el-pagination>
 
     <!-- 点击添加弹出的弹框 -->
-    <el-dialog title="添加品牌" :visible.sync="visible" width="50%">
+    <el-dialog
+      :title="`${trademarkForm.id ? '修改' : '添加'}品牌`"
+      :visible.sync="visible"
+      width="50%"
+    >
       <el-form
         :model="trademarkForm"
         :rules="rules"
@@ -61,7 +70,7 @@
             />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
-          <span>只能上传jpg/png文件，且不超过50kb</span>
+          <span>只能上传jpg/png文件，且不超过100kb</span>
         </el-form-item>
       </el-form>
 
@@ -117,10 +126,27 @@ export default {
       this.$refs[formName].validate(async (valid) => {
         //如果表单校验通过
         if (valid) {
+          const isUpdate = !!this.trademarkForm.id;
+          if (isUpdate) {
+            const re = this.trademark.find(
+              (tm) => tm.id === this.trademarkForm.id
+            );
+            if (
+              re.tmName === this.trademarkForm.tmName &&
+              re.logoUrl === this.trademarkForm.logoUrl
+            ) {
+              this.$message.warning("请不要提交未修改的数据");
+              return;
+            }
+          }
+          let result;
+          if (isUpdate) {
+            result = await this.$API.product.updatePageList(this.trademarkForm);
+          } else {
+            result = await this.$API.product.addPageList(this.trademarkForm);
+          }
           //表单验证通过发送请求，并传入数据
-          const result = await this.$API.product.addPageList(
-            this.trademarkForm
-          );
+
           console.log(result);
           if (result.code === 200) {
             //当添加成功，隐藏弹窗，并且更新列表数据。
@@ -146,15 +172,38 @@ export default {
       const imgType = ["image/jpg", "image/png", "image/jpeg"];
       const isValidType = imgType.indexOf(file.type) > -1;
       //判断图片的大小
-      const isLimit = file.size / 1024 < 50;
+      const isLimit = file.size / 1024 < 100;
 
       if (!isValidType) {
         this.$message.error("上传品牌LOGO只能是 JPG,PNG,JPEG 格式!");
       }
       if (!isLimit) {
-        this.$message.error("上传图片大小不能超过 50KB!");
+        this.$message.error("上传图片大小不能超过 100KB!");
       }
       return isValidType && isLimit;
+    },
+    async delTrademark(id) {
+      const result = await this.$API.product.deletePageList(id);
+      if (result.code === 200) {
+        this.$message.success("删除品牌数据成功");
+        this.getPageList(this.page, this.limit);
+      }
+    },
+    //更新数据，传入row，每一行的数据
+    update(row) {
+      this.visible = true;
+      //解构为row，如果直接赋值，因为赋值是引用地址赋值，由于双向数据绑定，会修改数据。
+      this.trademarkForm = { ...row };
+      this.$refs.trademarkForm && this.$refs.trademarkForm.clearValidate();
+    },
+    //点击添加数据，显示弹框，让弹框内容为空
+    add() {
+      this.visible = true;
+      this.trademarkForm = {
+        tmName: "",
+        logoUrl: "",
+      };
+      this.$refs.trademarkForm.clearValidate();
     },
   },
   mounted() {
