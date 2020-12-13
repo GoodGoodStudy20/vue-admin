@@ -2,7 +2,12 @@
   <div>
     <el-button type="primary" icon="el-icon-plus" @click="add">添加</el-button>
 
-    <el-table :data="trademark" border style="width: 100%; margin: 20px 0">
+    <el-table
+      :data="trademark"
+      border
+      style="width: 100%; margin: 20px 0"
+      v-loading="loading"
+    >
       <el-table-column type="index" label="序号" width="80px" align="center">
       </el-table-column>
       <el-table-column prop="tmName" label="品牌名称"> </el-table-column>
@@ -16,12 +21,14 @@
           <el-button type="warning" icon="el-icon-edit" @click="update(row)"
             >修改</el-button
           >
-          <el-button
-            type="danger"
-            icon="el-icon-delete"
-            @click="delTrademark(scope.row.id)"
-            >删除</el-button
+          <el-popconfirm
+            @onConfirm="delTrademark(row)"
+            title="这是一段内容确定删除吗？"
           >
+            <el-button slot="reference" type="danger" icon="el-icon-delete"
+              >删除</el-button
+            >
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -90,6 +97,7 @@ export default {
   name: "TrademarkList",
   data() {
     return {
+      loading: true,
       trademark: [], //总数据
       total: 0, //总条数
       page: 1, //页码
@@ -111,6 +119,7 @@ export default {
   methods: {
     //请求分页列表数据，封装复用
     async getPageList(page, limit) {
+      this.loading = true;
       const result = await this.$API.product.getPageList(page, limit);
       if (result.code === 200) {
         // this.$message.success("获取品牌数据成功")
@@ -121,6 +130,7 @@ export default {
       } else {
         this.$message.error("获取品牌数据失败");
       }
+      this.loading = false;
     },
     submitForm(formName) {
       this.$refs[formName].validate(async (valid) => {
@@ -150,7 +160,7 @@ export default {
           console.log(result);
           if (result.code === 200) {
             //当添加成功，隐藏弹窗，并且更新列表数据。
-            this.$message.success("添加品牌数据成功");
+            this.$message.success(`${isUpdate ? `修改` : `添加`}品牌数据成功`);
             this.visible = false;
             this.getPageList(this.page, this.limit);
           } else {
@@ -182,8 +192,8 @@ export default {
       }
       return isValidType && isLimit;
     },
-    async delTrademark(id) {
-      const result = await this.$API.product.deletePageList(id);
+    async delTrademark(row) {
+      const result = await this.$API.product.deletePageList(row.id);
       if (result.code === 200) {
         this.$message.success("删除品牌数据成功");
         this.getPageList(this.page, this.limit);
