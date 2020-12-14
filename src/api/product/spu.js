@@ -45,4 +45,32 @@ export default {
       data: spu
     } )
   },
+  //获取品牌数据
+  getTrademarkList () {
+    return request( {
+      method: "GET",
+      url: `${ api_name }/baseTrademark/getTrademarkList`,
+    } )
+  },
+  //获取SPU图片数据
+  getSpuImageList ( spuId ) {
+    return request( {
+      method: "GET",
+      url: `${ api_name }/spuImageList/${ spuId }`,
+    } )
+  },
+  //获取SPU销售属性列表
+  getSpuSaleAttrList ( spuId ) {
+    return request( {
+      method: "GET",
+      url: `${ api_name }/spuSaleAttrList/${ spuId }`,
+    } )
+  },
+  //获取所有销售属性数据
+  getAllSaleAttrList () {
+    return request( {
+      method: "GET",
+      url: `${ api_name }/baseSaleAttrList`,
+    } )
+  },
 }

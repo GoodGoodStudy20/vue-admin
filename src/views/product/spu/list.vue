@@ -1,8 +1,8 @@
 <template>
   <div>
     <AttrList />
-    <SpuShowList v-show="isShowSpuList" />
-    <SpuUpdateList v-show="!isShowSpuList" />
+    <SpuShowList v-if="isShowSpuList" @updateShowList="updateShowList" />
+    <SpuUpdateList v-else :item="item" />
   </div>
 </template>
 
@@ -15,7 +15,14 @@ export default {
   data() {
     return {
       isShowSpuList: true,
+      item: {},
     };
+  },
+  methods: {
+    updateShowList(row) {
+      this.isShowSpuList = false;
+      this.item = { ...row };
+    },
   },
   components: {
     AttrList,

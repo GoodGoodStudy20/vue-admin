@@ -21,7 +21,7 @@ tmId: 246 -->
             type="primary"
             icon="el-icon-edit"
             size="mini"
-            @click="update(row)"
+            @click="$emit('updateShowList',row)"
           ></el-button>
           <el-button
             slot="reference"
