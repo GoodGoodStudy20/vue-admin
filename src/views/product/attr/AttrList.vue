@@ -82,32 +82,37 @@ export default {
       } else {
         this.$message.error("获取商品列表失败");
       }
+      //清空父组件的数据。
+      this.$bus.$emit("clearList");
     },
     async handeChange2(category2Id) {
       this.category3List = [];
       this.category.category3Id = "";
       const result = await this.$API.attrlist.getCategory3(category2Id);
-      console.log(result);
+      // console.log(result);
       if (result.code === 200) {
         // this.$message.success("获取商品列表成功");
         this.category3List = result.data;
       } else {
         this.$message.error("获取商品列表失败");
       }
+      //清空父组件数据
+      this.$bus.$emit("clearList");
     },
     async handeChange3(category3Id) {
       const category = {
         ...this.category,
         category3Id,
       };
-      this.$emit("change", category);
+      this.$bus.$emit("change", category);
+
     },
   },
   async mounted() {
     const result = await this.$API.attrlist.getCategory1();
     if (result.code === 200) {
       // this.$message.success("获取商品列表成功");
-      console.log(result);
+      // console.log(result);
       this.category1List = result.data;
     } else {
       this.$message.error("获取商品列表失败");

@@ -201,19 +201,19 @@ export default {
     },
     //更新数据，传入row，每一行的数据
     update(row) {
+      this.$refs.trademarkForm && this.$refs.trademarkForm.clearValidate();
       this.visible = true;
       //解构为row，如果直接赋值，因为赋值是引用地址赋值，由于双向数据绑定，会修改数据。
       this.trademarkForm = { ...row };
-      this.$refs.trademarkForm && this.$refs.trademarkForm.clearValidate();
     },
     //点击添加数据，显示弹框，让弹框内容为空
     add() {
+      this.$refs.trademarkForm && this.$refs.trademarkForm.clearValidate();
       this.visible = true;
       this.trademarkForm = {
         tmName: "",
         logoUrl: "",
       };
-      this.$refs.trademarkForm.clearValidate();
     },
   },
   mounted() {

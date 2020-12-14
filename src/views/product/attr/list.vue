@@ -1,8 +1,12 @@
 <template>
   <div>
-    <AttrList @change="getAttrList" :disabled="!isShowList" />
-    <el-card v-show="isShowList && !isShowAddAttrList" style="margin: 20px 0">
-      <el-button type="primary" icon="el-icon-plus" @click="addAttr"
+    <AttrList :disabled="!isShowList" />
+    <el-card v-show="isShowList" style="margin: 20px 0">
+      <el-button
+        type="primary"
+        icon="el-icon-plus"
+        @click="add"
+        :disabled="!category.category3Id"
         >添加属性</el-button
       >
       <el-table :data="attrlist" border style="width: 100%">
@@ -23,12 +27,12 @@
         <el-table-column label="操作" width="150px">
           <template v-slot="{ row }">
             <el-button
-              type="primary"
+              type="warning"
               icon="el-icon-edit"
               size="mini"
               @click="update(row)"
             ></el-button>
-            <el-popconfirm title="这是一段内容确定删除吗？">
+            <el-popconfirm title="您确定删除吗？">
               <el-button
                 slot="reference"
                 type="danger"
@@ -51,7 +55,11 @@
           ></el-input>
         </el-form-item>
       </el-form>
-      <el-button type="primary" icon="el-icon-plus" @click="addAttrValue"
+      <el-button
+        type="primary"
+        icon="el-icon-plus"
+        @click="addAttrValue"
+        :disabled="!attr.attrName"
         >添加属性值</el-button
       >
       <el-table
@@ -99,60 +107,6 @@
       <el-button type="primary" @click="saveValue">保存</el-button>
       <el-button @click="isShowList = true">取消</el-button>
     </el-card>
-
-    <!-- 添加属性 -->
-    <el-card v-show="isShowAddAttrList" style="margin: 20px 0">
-      <el-form inline :model="attr" class="demo-form-inline">
-        <el-form-item label="属性名">
-          <el-input
-            v-model="attr.attrName"
-            placeholder="请输入属性名"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <el-button type="primary" icon="el-icon-plus" @click="addAttrValue"
-        >添加属性值</el-button
-      >
-      <el-button>取消</el-button>
-      <el-table
-        :data="attr.attrValueList"
-        border
-        style="width: 100%; margin: 20px 0"
-      >
-        <el-table-column type="index" label="序号" width="80px" align="center">
-        </el-table-column>
-
-        <el-table-column label="属性值名称">
-          <template v-slot="{ row, $index }">
-            <el-input
-              v-if="row.edit"
-              v-model="row.valueName"
-              size="mini"
-              ref="input"
-              @blur="editCompleted(row, $index)"
-              @keyup.enter.native="editCompleted(row, $index)"
-            ></el-input>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作">
-          <template v-slot="{ row, $index }">
-            <el-popconfirm
-              :title="`您确定删除${row.valueName}吗？`"
-              @onConfirm="delattrValue($index)"
-            >
-              <el-button
-                slot="reference"
-                type="danger"
-                icon="el-icon-delete"
-                size="mini"
-              ></el-button>
-            </el-popconfirm>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-button type="primary" @click="saveValue">保存</el-button>
-      <el-button @click="isShowList = true">取消</el-button>
-    </el-card>
   </div>
 </template>
 
@@ -164,10 +118,14 @@ export default {
     return {
       attrlist: [],
       isShowList: true,
-      isShowAddAttrList: false,
       attr: {
         attrName: "",
         attrValueList: [],
+      },
+      category: {
+        category1Id: "",
+        category2Id: "",
+        category3Id: "",
       },
     };
   },
@@ -177,7 +135,8 @@ export default {
       const result = await this.$API.attrlist.getAttrList(category);
       if (result.code === 200) {
         this.attrlist = result.data;
-        console.log(result);
+        // console.log(result);
+        // this.isShowAddAttrList = false;
       } else {
         this.$message.error(result.message);
       }
@@ -202,6 +161,12 @@ export default {
       this.attr.attrValueList.splice(index, 1);
     },
     async saveValue() {
+      const isAdd = !this.category.id;
+      const data = this.attr;
+      if (isAdd) {
+        data.categoryId = this.category.category3Id;
+        data.categoryLevel = 3;
+      }
       const result = await this.$API.attrlist.saveAttrInfo(this.attr);
       if (result.code === 200) {
         this.$message.success("属性值保存成功");
@@ -219,11 +184,25 @@ export default {
       }
       row.edit = false;
     },
-    addAttr() {
-      this.isShowAddAttrList = true;
+    add() {
+      this.isShowList = false;
+      this.attr.attrName = "";
+      this.attr.attrValueList = [];
+      this.attr.id = ""; //清空id防止点击修改后，再点击添加还存在id，但是添加不需要id
+    },
+    clearList() {
+      this.attrlist = [];
+      this.category.category3Id = "";
     },
   },
-  mounted() {},
+  mounted() {
+    this.$bus.$on("change", this.getAttrList);
+    this.$bus.$on("clearList", this.clearList);
+  },
+  beforeDestroy() {
+    this.$bus.$off("change", this.getAttrList);
+    this.$bus.$off("clearList", this.clearList);
+  },
   components: {
     AttrList,
   },

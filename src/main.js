@@ -42,8 +42,8 @@ import HintButton from '@/components/HintButton'
 import CategorySelector from '@/components/CategorySelector'
 
 // 注册全局组件
-Vue.component('HintButton', HintButton)
-Vue.component('CategorySelector', CategorySelector)
+Vue.component( 'HintButton', HintButton )
+Vue.component( 'CategorySelector', CategorySelector )
 
 // 挂载到Vue原型对象上, 以便组件中直接可见
 Vue.prototype.$hasBP = hasBtnPermission
@@ -69,9 +69,12 @@ Vue.prototype.$BASE_API = process.env.VUE_APP_BASE_API
 
 Vue.config.productionTip = false
 
-new Vue({
+new Vue( {
+  beforeCreate () {
+    Vue.prototype.$bus = this
+  },
   el: '#app',
   router,
   store,
-  render: h => h(App)
-})
+  render: h => h( App )
+} )
