@@ -79,7 +79,7 @@ export default {
       });
       if (result.code === 200) {
         this.$message.success("获取分页信息数据成功");
-        console.log(result);
+        // console.log(result);
         this.spuList = result.data.records;
         this.total = result.data.total;
       } else {
