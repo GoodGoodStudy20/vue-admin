@@ -27,7 +27,7 @@ export default {
     showList(category3Id) {
       this.isShowSpuList = true;
       this.$nextTick(() => {
-        this.$bus.$emit("change", category3Id);
+        this.$bus.$emit("change", {category3Id});
       });
     },
   },

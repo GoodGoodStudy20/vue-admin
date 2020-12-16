@@ -8,7 +8,13 @@ spuName: "雪碧"
 spuSaleAttrList: null
 tmId: 246 -->
   <el-card style="margin: 20px 0">
-    <el-button type="primary" icon="el-icon-plus">添加SPU</el-button>
+    <el-button
+      type="primary"
+      icon="el-icon-plus"
+      :disabled="!category.category3Id"
+      @click="$emit('updateShowList', { category3Id: category.category3Id })"
+      >添加SPU</el-button
+    >
     <el-table :data="spuList" border style="width: 100%" v-loading="loading">
       <el-table-column type="index" label="序号" width="80px" align="center">
       </el-table-column>
@@ -21,7 +27,7 @@ tmId: 246 -->
             type="primary"
             icon="el-icon-edit"
             size="mini"
-            @click="$emit('updateShowList',row)"
+            @click="$emit('updateShowList', row)"
           ></el-button>
           <el-button
             slot="reference"

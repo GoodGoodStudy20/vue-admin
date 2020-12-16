@@ -32,9 +32,8 @@ export default {
     return request( {
       method: "POST",
       url: `${ api_name }/updateSpuInfo`,
-      data: {
-        spu
-      }
+      data: spu
+
     } )
   },
   //保存spu数据
