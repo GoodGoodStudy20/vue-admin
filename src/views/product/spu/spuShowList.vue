@@ -22,7 +22,12 @@ tmId: 246 -->
       <el-table-column prop="description" label="SPU描述"> </el-table-column>
       <el-table-column label="操作">
         <template v-slot="{ row }">
-          <el-button type="primary" icon="el-icon-plus" size="mini"></el-button>
+          <el-button
+            type="primary"
+            icon="el-icon-plus"
+            size="mini"
+            @click="$emit('showSpuList', { ...row, ...category })"
+          ></el-button>
           <el-button
             type="primary"
             icon="el-icon-edit"
@@ -58,6 +63,7 @@ tmId: 246 -->
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "SpuShowList",
   data() {
@@ -65,14 +71,34 @@ export default {
       page: 1,
       limit: 3,
       total: 0,
-      category: {
-        category1Id: "",
-        category2Id: "",
-        category3Id: "",
-      },
+      // category: {
+      //   category1Id: "",
+      //   category2Id: "",
+      //   category3Id: "",
+      // },
       spuList: [],
       loading: false,
     };
+  },
+  watch: {
+    "category.category3Id": {
+      handler(category3Id) {
+        if (!category3Id) return;
+        this.getShowList(this.page, this.limit);
+      },
+      immediate: true, //一上来就触发一次
+    },
+    "category.category1Id"() {
+      this.clearList();
+    },
+    "category.category2Id"() {
+      this.clearList();
+    },
+  },
+  computed: {
+    ...mapState({
+      category: (state) => state.category.category,
+    }),
   },
   methods: {
     async getShowList(page, limit) {
@@ -93,25 +119,25 @@ export default {
       }
       this.loading = false;
     },
-    handleCategoryChange(category) {
-      this.category = category;
-      this.getShowList(this.page, this.limit);
-    },
+    // handleCategoryChange(category) {
+    //   this.category = category;
+    //   this.getShowList(this.page, this.limit);
+    // },
     clearList() {
-      (this.spuList = []),
-        (this.total = 0),
-        (this.page = 1),
-        (this.limit = 3),
-        (this.category.category3Id = "");
+      this.spuList = [];
+      this.total = 0;
+      this.page = 1;
+      this.limit = 3;
+      // (this.category.category3Id = "");
     },
   },
   mounted() {
-    this.$bus.$on("change", this.handleCategoryChange);
-    this.$bus.$on("clearList", this.clearList);
+    // this.$bus.$on("change", this.handleCategoryChange);
+    // this.$bus.$on("clearList", this.clearList);
   },
   beforeDestroy() {
-    this.$bus.$off("change", this.handleCategoryChange);
-    this.$bus.$off("clearList", this.clearList);
+    // this.$bus.$off("change", this.handleCategoryChange);
+    // this.$bus.$off("clearList", this.clearList);
   },
 };
 </script>

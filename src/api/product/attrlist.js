@@ -31,7 +31,7 @@ export default {
   deleteAttr (arrtId) {
     return request( {
       method: "DELETE",
-      url:`${ api_name }/deleteAttr${arrtId}`
+      url:`${ api_name }/deleteAttr/${arrtId}`
     })
   },
   saveAttrInfo ( attr) {

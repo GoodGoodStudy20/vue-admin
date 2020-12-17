@@ -32,7 +32,7 @@
               size="mini"
               @click="update(row)"
             ></el-button>
-            <el-popconfirm title="您确定删除吗？">
+            <el-popconfirm title="您确定删除吗？" @onConfirm="delAttr(row)">
               <el-button
                 slot="reference"
                 type="danger"
@@ -111,6 +111,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import AttrList from "./AttrList";
 export default {
   name: "list",
@@ -122,17 +123,44 @@ export default {
         attrName: "",
         attrValueList: [],
       },
-      category: {
-        category1Id: "",
-        category2Id: "",
-        category3Id: "",
-      },
+      // category: {
+      //   category1Id: "",
+      //   category2Id: "",
+      //   category3Id: "",
+      // },
     };
   },
+  computed: {
+    ...mapState({
+      category: (state) => state.category.category,
+    }),
+  },
+  watch: {
+    "category.category3Id"(category3Id) {
+      if (!category3Id) return;
+      this.getAttrList();
+    },
+    "category.category1Id"() {
+      this.clearList();
+    },
+    "category.category2Id"() {
+      this.clearList();
+    },
+  },
   methods: {
-    async getAttrList(category) {
-      this.category = category;
-      const result = await this.$API.attrlist.getAttrList(category);
+    async delAttr(row) {
+      console.log(row);
+      const result = await this.$API.attrlist.deleteAttr(row.id);
+      if (result.code === 200) {
+        this.getAttrList(this.category);
+        // console.log(result);
+        // this.isShowAddAttrList = false;
+      } else {
+        this.$message.error(result.message);
+      }
+    },
+    async getAttrList() {
+      const result = await this.$API.attrlist.getAttrList(this.category);
       if (result.code === 200) {
         this.attrlist = result.data;
         // console.log(result);
@@ -170,7 +198,7 @@ export default {
       const result = await this.$API.attrlist.saveAttrInfo(this.attr);
       if (result.code === 200) {
         this.$message.success("属性值保存成功");
-        this.getAttrList(this.category);
+        this.getAttrList();
         this.isShowList = true;
       } else {
         this.$message.error("保存失败");
@@ -196,12 +224,12 @@ export default {
     },
   },
   mounted() {
-    this.$bus.$on("change", this.getAttrList);
-    this.$bus.$on("clearList", this.clearList);
+    // this.$bus.$on("change", this.getAttrList);
+    // this.$bus.$on("clearList", this.clearList);
   },
   beforeDestroy() {
-    this.$bus.$off("change", this.getAttrList);
-    this.$bus.$off("clearList", this.clearList);
+    // this.$bus.$off("change", this.getAttrList);
+    // this.$bus.$off("clearList", this.clearList);
   },
   components: {
     AttrList,

@@ -122,7 +122,7 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="saveSaleAttr">保存</el-button>
-        <el-button @click="$emit('showList', spu.category3Id)">取消</el-button>
+        <el-button @click="$emit('showList')">取消</el-button>
       </el-form-item>
     </el-form>
     <el-dialog :visible.sync="visible">
@@ -132,6 +132,7 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   name: "SpuUpdateList",
   props: {
@@ -157,12 +158,14 @@ export default {
     };
   },
   computed: {
+    ...mapState({
+      category: (state) => state.category.category,
+    }),
     //计算销售属性
     filterSaleAttrList() {
       return this.AllSaleAttrList.filter((sale) => {
         return !this.spuSaleAttrList.find(
           (spuSale) => spuSale.baseSaleAttrId === sale.id
-
         );
       });
     },
@@ -358,6 +361,7 @@ spuId:2263
         if (valid) {
           const spu = {
             ...this.spu,
+            category3Id:this.category.category3Id,
             spuImageList: this.spuImgList,
             spuSaleAttrList: this.spuSaleAttrList,
           };
@@ -370,7 +374,7 @@ spuId:2263
 
           if (result.code === 200) {
             this.$message.success("数据更新成功");
-            this.$emit("showList", this.spu.category3Id);
+            this.$emit("showList");
           } else {
             this.$message.error(result.message);
           }
@@ -379,14 +383,13 @@ spuId:2263
     },
   },
   mounted() {
-     console.log(this.spu);
+    console.log(this.spu);
     this.getTrademarkList();
     this.getAllSaleAttrList();
     if (this.spu.id) {
       this.getSpuSaleAttrList();
       this.getSpuImageList();
     }
-
   },
 };
 </script>

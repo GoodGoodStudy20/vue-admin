@@ -1,25 +1,39 @@
 <template>
   <div>
-    <AttrList />
-    <SpuShowList v-if="isShowSpuList" @updateShowList="updateShowList" />
-    <SpuUpdateList v-else :item="item" @showList="showList"/>
+    <SkuList v-if="isShowSkuList" :spuItem="spuItem"/>
+    <div v-else>
+      <AttrList :disabled="!isShowSpuList"/>
+      <SpuShowList
+        v-if="isShowSpuList"
+        @updateShowList="updateShowList"
+        @showSpuList="showSpuList"
+      />
+      <SpuUpdateList v-else :item="item" @showList="showList" />
+    </div>
   </div>
 </template>
 
 <script>
-import { category } from "@/api";
+// import { category } from "@/api";
 import AttrList from "../attr/AttrList";
 import SpuShowList from "./spuShowList";
 import SpuUpdateList from "./spuUpdateList";
+import SkuList from "./skuList";
 export default {
   name: "SpuList",
   data() {
     return {
       isShowSpuList: true,
       item: {},
+      isShowSkuList: false,
+      spuItem: {},
     };
   },
   methods: {
+    showSpuList(row) {
+      this.isShowSkuList = true;
+      this.spuItem = { ...row };
+    },
     updateShowList(row) {
       this.isShowSpuList = false;
       this.item = { ...row };
@@ -27,7 +41,7 @@ export default {
     showList(category3Id) {
       this.isShowSpuList = true;
       this.$nextTick(() => {
-        this.$bus.$emit("change", {category3Id});
+        this.$bus.$emit("change", { category3Id });
       });
     },
   },
@@ -35,6 +49,7 @@ export default {
     AttrList,
     SpuShowList,
     SpuUpdateList,
+    SkuList,
   },
 };
 </script>
