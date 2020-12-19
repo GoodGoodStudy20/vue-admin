@@ -82,13 +82,13 @@ export default {
       "category/getCategory2List",
       "category/getCategory3List",
     ]),
-    clearList() {
-      (this.spuList = []),
-        (this.total = 0),
-        (this.page = 1),
-        (this.limit = 3),
-        (this.category.category3Id = "");
-    },
+    // clearList() {
+    //   this.spuList = [];
+    //   this.total = 0;
+    //   this.page = 1;
+    //   this.limit = 3;
+    //   this.category.category3Id = "";
+    // },
     ...mapMutations(["category/SET_CATEGORY3_ID"]),
     async handeChange1(category1Id) {
       /* // console.log(result);
@@ -98,6 +98,8 @@ export default {
       } else {
         this.$message.error("获取商品列表失败");
       } */
+      this.category.category2Id = "";
+      this.category.category3Id = "";
       this["category/getCategory2List"](category1Id);
       //清空父组件的数据。
       // this.$bus.$emit("clearList");
@@ -113,7 +115,7 @@ export default {
       } else {
         this.$message.error("获取商品列表失败");
       } */
-
+      this.category.category3Id = "";
       this["category/getCategory3List"](category2Id);
       //清空父组件数据
       // this.$bus.$emit("clearList");

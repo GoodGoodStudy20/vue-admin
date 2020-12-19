@@ -149,7 +149,7 @@ export default {
   },
   methods: {
     async delAttr(row) {
-      console.log(row);
+      // console.log(row);
       const result = await this.$API.attrlist.deleteAttr(row.id);
       if (result.code === 200) {
         this.getAttrList(this.category);

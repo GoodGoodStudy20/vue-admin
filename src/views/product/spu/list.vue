@@ -1,8 +1,8 @@
 <template>
   <div>
-    <SkuList v-if="isShowSkuList" :spuItem="spuItem"/>
+    <SkuList v-if="isShowSkuList" :spuItem="spuItem" @showList="showList" />
     <div v-else>
-      <AttrList :disabled="!isShowSpuList"/>
+      <AttrList :disabled="!isShowSpuList" />
       <SpuShowList
         v-if="isShowSpuList"
         @updateShowList="updateShowList"
@@ -38,11 +38,11 @@ export default {
       this.isShowSpuList = false;
       this.item = { ...row };
     },
-    showList(category3Id) {
+    showList(category) {
       this.isShowSpuList = true;
-      this.$nextTick(() => {
-        this.$bus.$emit("change", { category3Id });
-      });
+      // this.$nextTick(() => {
+      // this.$bus.$emit("change", { category3Id });
+      // });
     },
   },
   components: {
